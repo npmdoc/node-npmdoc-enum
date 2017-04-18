@@ -56,6 +56,15 @@
 
         <li>
 
+            <a class="apidocElementLiA" href="#apidoc.element.enum.enum">
+            function <span class="apidocSignatureSpan"></span>enum
+            <span class="apidocSignatureSpan">(map, options)</span>
+            </a>
+
+        </li>
+
+        <li>
+
             <a class="apidocElementLiA" href="#apidoc.element.enum.enum_2_4_0">
             function <span class="apidocSignatureSpan">enum.</span>enum_2_4_0
             <span class="apidocSignatureSpan">(map, options)</span>
@@ -182,6 +191,91 @@
 
 <div class="apidocSectionDiv">
 <h1><a href="#apidoc.module.enum" id="apidoc.module.enum">module enum</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.enum.enum" id="apidoc.element.enum.enum">
+        function <span class="apidocSignatureSpan"></span>enum
+        <span class="apidocSignatureSpan">(map, options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function Enum(map, options) {
+  var _this = this;
+
+  _classCallCheck(this, Enum);
+
+<span class="apidocCodeCommentSpan">  /* implement the "ref type interface", so that Enum types can
+   * be used in `node-ffi` function declarations and invokations.
+   * In C, these Enums act as `uint32_t` types.
+   *
+   * https://github.com/TooTallNate/ref#the-type-interface
+   */
+</span>  this.size = 4;
+  this.indirection = 1;
+
+  if (options &amp;&amp; isString(options)) {
+    options = { name: options };
+  }
+
+  this._options = options || {};
+  this._options.separator = this._options.separator || " | ";
+  this._options.endianness = this._options.endianness || endianness;
+  this._options.ignoreCase = this._options.ignoreCase || false;
+  this._options.freez = this._options.freez || false;
+
+  this.enums = [];
+
+  if (map.length) {
+    this._enumLastIndex = map.length;
+    var array = map;
+    map = {};
+
+    for (var i = 0; i &lt; array.length; i++) {
+      map[array[i]] = Math.pow(2, i);
+    }
+  }
+
+  for (var member in map) {
+    guardReservedKeys(this._options.name, member);
+    this[member] = new EnumItem(member, map[member], { ignoreCase: this._options.ignoreCase });
+    this.enums.push(this[member]);
+  }
+  this._enumMap = map;
+
+  if (this._options.ignoreCase) {
+    this.getLowerCaseEnums = function () {
+      var res = {};
+      for (var i = 0, len = this.enums.length; i &lt; len; i++) {
+        res[this.enums[i].key.toLowerCase()] = this.enums[i];
+      }
+      return res;
+    };
+  }
+
+  if (this._options.name) {
+    this.name = this._options.name;
+  }
+
+  var isFlaggable = function () {
+    for (var i = 0, len = _this.enums.length; i &lt; len; i++) {
+      var e = _this.enums[i];
+
+      if (!(e.value !== 0 &amp;&amp; !(e.value &amp; e.value - 1))) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  this.isFlaggable = isFlaggable();
+  if (this._options.freez) {
+    this.freezeEnums(); //this will make instances of Enum non-extensible
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
 
 
     <h2>
